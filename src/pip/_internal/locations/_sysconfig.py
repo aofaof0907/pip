@@ -24,6 +24,8 @@ logger = logging.getLogger(__name__)
 
 _AVAILABLE_SCHEMES = set(sysconfig.get_scheme_names())
 
+_HAS_PREFERRED_SCHEME_API = sys.version_info >= (3, 10)
+
 
 def _infer_prefix() -> str:
     """Try to find a prefix scheme for the current platform.
@@ -37,6 +39,8 @@ def _infer_prefix() -> str:
 
     If none of the above works, fall back to ``posix_prefix``.
     """
+    if _HAS_PREFERRED_SCHEME_API:
+        return sysconfig.get_preferred_scheme("prefix")
     implementation_suffixed = f"{sys.implementation.name}_{os.name}"
     if implementation_suffixed in _AVAILABLE_SCHEMES:
         return implementation_suffixed
@@ -52,6 +56,8 @@ def _infer_prefix() -> str:
 
 def _infer_user() -> str:
     """Try to find a user scheme for the current platform."""
+    if _HAS_PREFERRED_SCHEME_API:
+        return sysconfig.get_preferred_scheme("user")
     suffixed = f"{os.name}_user"
     if suffixed in _AVAILABLE_SCHEMES:
         return suffixed
@@ -62,6 +68,8 @@ def _infer_user() -> str:
 
 def _infer_home() -> str:
     """Try to find a home for the current platform."""
+    if _HAS_PREFERRED_SCHEME_API:
+        return sysconfig.get_preferred_scheme("home")
     suffixed = f"{os.name}_home"
     if suffixed in _AVAILABLE_SCHEMES:
         return suffixed
