@@ -1,4 +1,5 @@
 import logging
+import os
 import pathlib
 import sys
 import sysconfig
@@ -45,13 +46,16 @@ def _default_base(*, user: bool) -> str:
 def _warn_if_mismatch(old: pathlib.Path, new: pathlib.Path, *, key: str) -> bool:
     if old == new:
         return False
-    issue_url = "https://github.com/pypa/pip/issues/9617"
+    issue_url = "https://github.com/pypa/pip/issues/10151"
     message = (
         "Value for %s does not match. Please report this to <%s>"
         "\ndistutils: %s"
         "\nsysconfig: %s"
     )
-    logger.debug(message, key, issue_url, old, new)
+    if os.environ.get("_PIP_LOCATIONS_NO_WARN_ON_MISMATCH"):
+        logger.debug(message, key, issue_url, old, new)
+    else:
+        logger.warning(message, key, issue_url, old, new)
     return True
 
 
